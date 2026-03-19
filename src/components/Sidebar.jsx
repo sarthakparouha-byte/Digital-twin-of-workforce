@@ -13,94 +13,109 @@ const Sidebar = ({ activeView, onViewChange, exScore, roi }) => {
   return (
     <aside style={{
       width: '220px',
-      height: '100vh',
+      minHeight: '100vh',
       backgroundColor: 'var(--surface)',
       borderRight: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
-      padding: '1.5rem',
-      flexShrink: 0
+      padding: '28px 16px',
+      position: 'fixed',
+      top: 0, left: 0, bottom: 0,
+      zIndex: 100
     }}>
       {/* Brand Header */}
-      <div style={{ marginBottom: '3rem' }}>
-        <h1 className="font-mono text-cyan" style={{ fontSize: '1.5rem', margin: 0, letterSpacing: '1px' }}>TWINFORGE</h1>
-        <div style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '2px' }}>
+      <div style={{ padding: '0 8px 32px' }}>
+        <div style={{
+          fontFamily: 'var(--font-sora)',
+          fontWeight: 700,
+          fontSize: '18px',
+          letterSpacing: '0.5px',
+          color: 'var(--ink-1)'
+        }}>TwinForge</div>
+        <div style={{
+          fontSize: '10px',
+          fontWeight: 500,
+          letterSpacing: '2px',
+          textTransform: 'uppercase',
+          color: 'var(--ink-3)',
+          marginTop: '2px'
+        }}>
           AI Digital Twin
         </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+      <nav style={{ flex: 1 }}>
+        <div style={{
+          fontSize: '10px',
+          fontWeight: 600,
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          color: 'var(--ink-3)',
+          padding: '0 10px',
+          marginBottom: '6px'
+        }}>Workspace</div>
         {navItems.map(item => {
           const isActive = activeView === item.id;
           const Icon = item.icon;
           return (
-            <button
+            <div
               key={item.id}
               onClick={() => onViewChange(item.id)}
+              className={isActive ? 'nav-item active' : 'nav-item'}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                border: 'none',
-                background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                color: isActive ? 'var(--text)' : 'var(--muted)',
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.95rem',
+                gap: '10px',
+                padding: '10px 12px',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '14px',
+                fontWeight: isActive ? 600 : 500,
+                color: isActive ? 'var(--accent)' : 'var(--ink-2)',
+                background: isActive ? 'var(--accent-dim)' : 'transparent',
                 cursor: 'pointer',
-                textAlign: 'left',
-                position: 'relative',
-                transition: 'all 0.2s',
+                transition: 'all 0.15s',
+                marginBottom: '2px',
               }}
             >
-              {isActive && (
-                <motion.div 
-                  layoutId="active-indicator"
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: '15%',
-                    bottom: '15%',
-                    width: '3px',
-                    backgroundColor: 'var(--accent)',
-                    borderRadius: '0 4px 4px 0',
-                    boxShadow: '0 0 8px var(--accent)'
-                  }}
-                />
-              )}
-              <Icon size={18} color={isActive ? 'var(--accent)' : 'currentColor'} />
+              <Icon size={16} />
               {item.label}
-            </button>
+            </div>
           )
         })}
       </nav>
 
       {/* Live Snapshot */}
       <div style={{
-        marginTop: 'auto',
-        background: 'rgba(0,0,0,0.2)',
-        borderRadius: '12px',
-        padding: '1.25rem',
-        border: '1px solid var(--border)'
+        background: 'var(--surface-2)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        padding: '16px',
+        marginTop: 'auto'
       }}>
-        <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>
+        <div style={{
+          fontSize: '10px',
+          fontWeight: 600,
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          color: 'var(--ink-3)',
+          marginBottom: '14px'
+        }}>
           Live Snapshot
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-             <span style={{ fontSize: '0.85rem' }}>Employees</span>
-             <span className="font-mono text-cyan">2,400</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+             <span style={{ color: 'var(--ink-2)' }}>Employees</span>
+             <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>2,400</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-             <span style={{ fontSize: '0.85rem' }}>Avg EX Score</span>
-             <span className="font-mono text-cyan">{exScore}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+             <span style={{ color: 'var(--ink-2)' }}>Avg EX Score</span>
+             <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>{exScore}</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-             <span style={{ fontSize: '0.85rem' }}>Projected ROI</span>
-             <span className="font-mono text-cyan">{roi}%</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+             <span style={{ color: 'var(--ink-2)' }}>Projected ROI</span>
+             <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--green)' }}>{roi}%</span>
           </div>
         </div>
       </div>

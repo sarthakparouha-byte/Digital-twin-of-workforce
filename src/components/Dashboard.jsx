@@ -15,35 +15,61 @@ const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onS
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '2rem', gap: '2rem', overflowY: 'auto' }}
+      style={{ 
+        marginLeft: '220px',
+        flex: 1,
+        padding: '36px 40px',
+        maxWidth: 'calc(100vw - 220px)',
+        height: '100vh',
+        overflowY: 'auto'
+      }}
     >
-      {/* Topbar */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-         <div>
-            <h2 className="font-mono text-cyan" style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Digital Workforce Twin</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--muted)' }}>
-               <span style={{
-                 width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--accent3)',
-                 boxShadow: '0 0 8px var(--accent3)', animation: 'pulse 2s infinite'
-               }}></span>
-               <span className="font-mono" style={{ fontSize: '0.85rem', letterSpacing: '1px' }}>SIMULATION ACTIVE</span>
-            </div>
-         </div>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '36px' }}>
+        <div>
+          <div style={{
+            fontFamily: 'var(--font-sora)',
+            fontSize: '26px',
+            fontWeight: 700,
+            color: 'var(--ink-1)',
+            letterSpacing: '-0.3px'
+          }}>Digital Workforce Twin</div>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '7px',
+            background: 'var(--green-dim)',
+            border: '1px solid rgba(62,207,142,0.25)',
+            color: 'var(--green)',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase',
+            padding: '5px 12px',
+            borderRadius: '100px',
+            marginTop: '10px'
+          }}>
+            <span style={{
+              width: '6px', height: '6px',
+              background: 'var(--green)',
+              borderRadius: '50%',
+              animation: 'pulse-dot 2s infinite'
+            }}></span>
+            Simulation Active
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="btn btn-outline" onClick={onSaveScenario}>
+            <Save size={14} /> <span>Save Scenario</span>
+          </button>
+          <button className="btn btn-primary" onClick={onRunAI}>
+            <Bot size={14} /> <span>Run AI Optimizer</span>
+          </button>
+        </div>
+      </div>
 
-         <div style={{ display: 'flex', gap: '1rem' }}>
-           <button className="btn btn-secondary" onClick={onSaveScenario}>
-             <Save size={18} />
-             Save Scenario
-           </button>
-           <button className="btn btn-primary" onClick={onRunAI}>
-             <Bot size={18} />
-             Run AI Optimizer
-           </button>
-         </div>
-      </header>
-
-      {/* KPI Cards Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+      {/* KPI Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '28px' }}>
          <KPICard 
            title="Employee EX Score" 
            value={currentMetrics.exScore} 
@@ -67,34 +93,52 @@ const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onS
          />
       </div>
 
-      {/* Main Content Areas */}
-      <div style={{ display: 'flex', gap: '1.5rem', flex: 1, minHeight: 0 }}>
+      {/* Main Content */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
          {/* Left Column */}
-         <div style={{ flex: '6', minWidth: 0, height: '100%' }}>
-           <SliderPanel 
-              state={state} 
-              onChange={onStateChange} 
-              onReset={onReset} 
-              onOptimize={onOptimize} 
-           />
-         </div>
+         <SliderPanel 
+            state={state} 
+            onChange={onStateChange} 
+            onReset={onReset} 
+            onOptimize={onOptimize} 
+         />
 
-         {/* Right Column */}
-         <div style={{ flex: '4', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%' }}>
-            <div style={{ flex: 1, minHeight: 0 }}>
-               <PersonaRadarChart personaMetrics={personaMetrics} />
-            </div>
-            <div style={{ flex: 1, minHeight: 0 }}>
-               <PersonaBarChart personaMetrics={personaMetrics} globalExScore={currentMetrics.exScore} />
-            </div>
-         </div>
+         {/* Right column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+           <div className="card" style={{ height: '380px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{
+                fontFamily: 'var(--font-sora)',
+                fontSize: '15px',
+                fontWeight: 600,
+                color: 'var(--ink-1)',
+                marginBottom: '20px',
+                letterSpacing: '-0.1px'
+              }}>Workforce Impact Radar</div>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                 <PersonaRadarChart personaMetrics={personaMetrics} />
+              </div>
+           </div>
+
+           <div className="card" style={{ height: '380px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{
+                fontFamily: 'var(--font-sora)',
+                fontSize: '15px',
+                fontWeight: 600,
+                color: 'var(--ink-1)',
+                marginBottom: '20px',
+                letterSpacing: '-0.1px'
+              }}>EX Score by Persona</div>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                 <PersonaBarChart personaMetrics={personaMetrics} globalExScore={currentMetrics.exScore} />
+              </div>
+           </div>
+        </div>
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-          70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; }
+          50%      { opacity: 0.4; }
         }
       `}} />
     </motion.div>

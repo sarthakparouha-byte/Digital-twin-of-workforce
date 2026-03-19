@@ -46,53 +46,128 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
   };
 
   return (
-    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '2rem' }}>
-      <h3 className="font-mono text-cyan" style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>Simulation Control Panel</h3>
+    <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '28px' }}>
+      <div style={{
+        fontFamily: 'var(--font-sora)',
+        fontSize: '15px',
+        fontWeight: 600,
+        color: 'var(--ink-1)',
+        marginBottom: '24px',
+        letterSpacing: '-0.1px'
+      }}>Simulation Control Panel</div>
       
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', flex: 1, overflowY: 'auto', paddingRight: '1rem', marginRight: '-1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', flex: 1, overflowY: 'auto', paddingRight: '12px' }}>
         {configs.map(conf => {
           const val = state[conf.key];
           const status = getStatus(val, conf.invertStatus);
+          const isOptimized = status.text === "Optimized";
+          
           return (
-            <div key={conf.key} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label style={{ fontSize: '0.9rem', color: 'var(--text)', fontWeight: 500 }}>{conf.label}</label>
+            <div key={conf.key} style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--ink-1)' }}>{conf.label}</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {isOptimized && (
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
+                      color: 'var(--green)',
+                      background: 'var(--green-dim)',
+                      border: '1px solid rgba(62,207,142,0.2)',
+                      padding: '3px 8px',
+                      borderRadius: '4px'
+                    }}>Optimized</span>
+                  )}
+                  {!isOptimized && (
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
+                      color: status.color,
+                      background: status.bg,
+                      padding: '3px 8px',
+                      borderRadius: '4px'
+                    }}>{status.text}</span>
+                  )}
                   <span style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    backgroundColor: status.bg,
-                    color: status.color,
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                    fontFamily: 'var(--font-mono)'
-                  }}>
-                    {status.text}
-                  </span>
-                  <span className="font-mono" style={{ width: '28px', textAlign: 'right', fontWeight: 'bold' }}><AnimatedMiniCounter value={val} /></span>
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '15px',
+                    fontWeight: 500,
+                    color: 'var(--ink-1)',
+                    minWidth: '26px',
+                    textAlign: 'right'
+                  }}><AnimatedMiniCounter value={val} /></span>
                 </div>
               </div>
-              <input 
-                type="range"
-                min="0"
-                max="100"
-                value={val}
-                onChange={(e) => onChange(conf.key, parseInt(e.target.value))}
-                style={{ 
-                  background: `linear-gradient(to right, var(--accent) ${val}%, var(--surface2) ${val}%)`
-                }}
-              />
+              
+              <div style={{ position: 'relative', padding: '4px 0' }}>
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0, right: 0,
+                  height: '4px',
+                  background: 'var(--surface-2)',
+                  borderRadius: '2px',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none'
+                }}></div>
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, var(--accent) 0%, #7eb3ff 100%)',
+                  borderRadius: '2px',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  width: `${val}%`,
+                  transition: 'width 0.2s'
+                }}></div>
+                <input 
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={val}
+                  onChange={(e) => onChange(conf.key, parseInt(e.target.value))}
+                  style={{ position: 'relative', zIndex: 2 }}
+                />
+              </div>
             </div>
           );
         })}
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-        <button className="btn btn-secondary" onClick={onReset} style={{ flex: 1, justifyContent: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '28px' }}>
+        <button className="btn-ghost" onClick={onReset} style={{ 
+          background: 'var(--surface-2)',
+          border: '1px solid var(--border-2)',
+          color: 'var(--ink-2)',
+          padding: '12px',
+          borderRadius: 'var(--radius-sm)',
+          fontFamily: 'var(--font-body)',
+          fontSize: '13px',
+          fontWeight: 600,
+          cursor: 'pointer',
+          transition: 'all 0.15s'
+        }}>
           Reset to Baseline
         </button>
-        <button className="btn btn-primary" onClick={onOptimize} style={{ flex: 1, justifyContent: 'center' }}>
+        <button className="btn-apply" onClick={onOptimize} style={{ 
+          background: 'linear-gradient(135deg, var(--accent) 0%, #7b5fff 100%)',
+          color: '#fff',
+          padding: '12px',
+          borderRadius: 'var(--radius-sm)',
+          fontFamily: 'var(--font-body)',
+          fontSize: '13px',
+          fontWeight: 600,
+          border: 'none',
+          cursor: 'pointer',
+          transition: 'opacity 0.15s',
+          boxShadow: '0 4px 16px rgba(79,124,255,0.35)'
+        }}>
           Apply Optimal State
         </button>
       </div>

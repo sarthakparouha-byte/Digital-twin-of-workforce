@@ -49,28 +49,47 @@ const KPICard = ({ title, value, previousValue = null, suffix = "", prefix = "" 
   return (
     <motion.div 
       className="glass-card"
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '16px 20px' }}
+      style={{ display: 'flex', flexDirection: 'column', padding: '24px 22px' }}
       whileHover={{ y: -4 }}
     >
-      <h3 className="font-mono" style={{ fontSize: '0.85rem', color: 'var(--muted)', textTransform: 'uppercase', margin: 0 }}>{title}</h3>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
-        <span className="font-mono text-cyan" style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>
-          <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
-        </span>
-        
-        {previousValue !== null && delta !== 0 && (
+      <h3 style={{ 
+        fontSize: '11px', 
+        fontWeight: 600, 
+        letterSpacing: '1.3px', 
+        textTransform: 'uppercase', 
+        color: 'var(--ink-3)',
+        marginBottom: '16px',
+        margin: 0
+      }}>{title}</h3>
+      
+      <div style={{
+        fontFamily: 'var(--font-sora)',
+        fontSize: '38px',
+        fontWeight: 700,
+        lineHeight: 1,
+        color: 'var(--ink-1)',
+        marginBottom: '10px'
+      }}>
+        <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
+      </div>
+      
+      {previousValue !== null && delta !== 0 && (
+        <div style={{ display: 'flex' }}>
           <span style={{
-             fontSize: '0.9rem', 
-             fontWeight: 'bold',
-             color: isPositive ? 'var(--accent3)' : 'var(--danger)',
-             display: 'flex',
+             display: 'inline-flex',
              alignItems: 'center',
-             gap: '0.2rem'
+             gap: '4px',
+             fontSize: '12px',
+             fontWeight: 600,
+             color: isPositive ? 'var(--green)' : '#ef4444',
+             background: isPositive ? 'var(--green-dim)' : 'rgba(239, 68, 68, 0.12)',
+             padding: '3px 8px',
+             borderRadius: '100px',
           }}>
             {isPositive ? '↑' : '↓'} {Math.abs(delta).toFixed(1) % 1 === 0 ? Math.abs(delta) : Math.abs(delta).toFixed(1)}{suffix}
           </span>
-        )}
-      </div>
+        </div>
+      )}
     </motion.div>
   );
 };
