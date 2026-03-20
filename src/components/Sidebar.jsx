@@ -1,8 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, Bot, ShoppingBag, Clock } from 'lucide-react';
+import { LayoutDashboard, Bot, ShoppingBag, Clock, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Sidebar = ({ activeView, onViewChange, exScore, roi }) => {
+const Sidebar = ({ activeView, onViewChange, exScore, roi, totalEmployees, onOpenSettings }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'copilot', label: 'AI Copilot', icon: Bot },
@@ -91,7 +91,8 @@ const Sidebar = ({ activeView, onViewChange, exScore, roi }) => {
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius)',
         padding: '16px',
-        marginTop: 'auto'
+        marginTop: 'auto',
+        marginBottom: '16px'
       }}>
         <div style={{
           fontSize: '10px',
@@ -107,7 +108,7 @@ const Sidebar = ({ activeView, onViewChange, exScore, roi }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
              <span style={{ color: 'var(--ink-2)' }}>Employees</span>
-             <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>2,400</span>
+             <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>{totalEmployees?.toLocaleString() || '2,400'}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
              <span style={{ color: 'var(--ink-2)' }}>Avg EX Score</span>
@@ -119,6 +120,25 @@ const Sidebar = ({ activeView, onViewChange, exScore, roi }) => {
           </div>
         </div>
       </div>
+
+      <button 
+        onClick={onOpenSettings}
+        className="btn btn-outline"
+        style={{
+          width: '100%',
+          fontSize: '12px',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          borderColor: 'var(--border)',
+          marginTop: '16px'
+        }}
+      >
+        <Settings size={14} />
+        Setup Organization
+      </button>
     </aside>
   );
 };

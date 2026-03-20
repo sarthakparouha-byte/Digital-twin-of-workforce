@@ -9,19 +9,21 @@ import { motion } from 'framer-motion';
 const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onStateChange, onReset, onOptimize, onRunAI, onSaveScenario }) => {
 
   return (
-    <motion.div 
+    <motion.div
       className="dashboard-view"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      style={{ 
+      style={{
+        /* ✅ FIXED: sidebar is 220px fixed. Push content right with marginLeft,
+           set a proper width so it doesn't overflow or collapse */
         marginLeft: '220px',
-        flex: 1,
+        width: 'calc(100vw - 220px)',
+        minHeight: '100vh',
         padding: '36px 40px',
-        maxWidth: 'calc(100vw - 220px)',
-        height: '100vh',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        overflowX: 'hidden',
       }}
     >
       {/* Header */}
@@ -53,12 +55,13 @@ const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onS
               width: '6px', height: '6px',
               background: 'var(--green)',
               borderRadius: '50%',
-              animation: 'pulse-dot 2s infinite'
+              animation: 'pulse-dot 2s infinite',
+              display: 'inline-block',
             }}></span>
             Simulation Active
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
           <button className="btn btn-outline" onClick={onSaveScenario}>
             <Save size={14} /> <span>Save Scenario</span>
           </button>
@@ -69,76 +72,82 @@ const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onS
       </div>
 
       {/* KPI Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '28px' }}>
-         <KPICard 
-           title="Employee EX Score" 
-           value={currentMetrics.exScore} 
-           previousValue={baselineMetrics.exScore} 
-         />
-         <KPICard 
-           title="Projected ROI" 
-           value={currentMetrics.roi} 
-           previousValue={baselineMetrics.roi} 
-           suffix="%"
-         />
-         <KPICard 
-           title="Productivity Index" 
-           value={currentMetrics.scores.productivity} 
-           previousValue={baselineMetrics.scores.productivity} 
-         />
-         <KPICard 
-           title="Adoption Rate" 
-           value={currentMetrics.scores.adoption} 
-           previousValue={baselineMetrics.scores.adoption} 
-         />
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '16px',
+        marginBottom: '28px'
+      }}>
+        <KPICard
+          title="Employee EX Score"
+          value={currentMetrics.exScore}
+          previousValue={baselineMetrics.exScore}
+        />
+        <KPICard
+          title="Projected ROI"
+          value={currentMetrics.roi}
+          previousValue={baselineMetrics.roi}
+          suffix="%"
+        />
+        <KPICard
+          title="Productivity Index"
+          value={currentMetrics.scores.productivity}
+          previousValue={baselineMetrics.scores.productivity}
+        />
+        <KPICard
+          title="Adoption Rate"
+          value={currentMetrics.scores.adoption}
+          previousValue={baselineMetrics.scores.adoption}
+        />
       </div>
 
       {/* Main Content */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-         {/* Left Column */}
-         <SliderPanel 
-            state={state} 
-            onChange={onStateChange} 
-            onReset={onReset} 
-            onOptimize={onOptimize} 
-         />
+        {/* Left Column */}
+        <SliderPanel
+          state={state}
+          onChange={onStateChange}
+          onReset={onReset}
+          onOptimize={onOptimize}
+        />
 
-         {/* Right column */}
+        {/* Right Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-           <div className="card" style={{ height: '380px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{
-                fontFamily: 'var(--font-sora)',
-                fontSize: '15px',
-                fontWeight: 600,
-                color: 'var(--ink-1)',
-                marginBottom: '20px',
-                letterSpacing: '-0.1px'
-              }}>Workforce Impact Radar</div>
-              <div style={{ flex: 1, minHeight: 0 }}>
-                 <PersonaRadarChart personaMetrics={personaMetrics} />
-              </div>
-           </div>
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', minHeight: '360px' }}>
+            <div style={{
+              fontFamily: 'var(--font-sora)',
+              fontSize: '15px',
+              fontWeight: 600,
+              color: 'var(--ink-1)',
+              marginBottom: '20px',
+              letterSpacing: '-0.1px'
+            }}>Workforce Impact Radar</div>
+            <div style={{ flex: 1, minHeight: 0, height: '280px' }}>
+              <PersonaRadarChart personaMetrics={personaMetrics} />
+            </div>
+          </div>
 
-           <div className="card" style={{ height: '380px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{
-                fontFamily: 'var(--font-sora)',
-                fontSize: '15px',
-                fontWeight: 600,
-                color: 'var(--ink-1)',
-                marginBottom: '20px',
-                letterSpacing: '-0.1px'
-              }}>EX Score by Persona</div>
-              <div style={{ flex: 1, minHeight: 0 }}>
-                 <PersonaBarChart personaMetrics={personaMetrics} globalExScore={currentMetrics.exScore} />
-              </div>
-           </div>
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
+            <div style={{
+              fontFamily: 'var(--font-sora)',
+              fontSize: '15px',
+              fontWeight: 600,
+              color: 'var(--ink-1)',
+              marginBottom: '20px',
+              letterSpacing: '-0.1px'
+            }}>EX Score by Persona</div>
+            <div style={{ flex: 1, minHeight: 0, height: '220px' }}>
+              <PersonaBarChart personaMetrics={personaMetrics} globalExScore={currentMetrics.exScore} />
+            </div>
+          </div>
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes pulse-dot {
           0%, 100% { opacity: 1; }
-          50%      { opacity: 0.4; }
+          50%       { opacity: 0.4; }
         }
       `}} />
     </motion.div>

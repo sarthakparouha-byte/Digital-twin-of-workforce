@@ -2,44 +2,26 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import Scenario from './models/Scenario.js';
+import Settings from './models/Settings.js';
 
-dotenv.config();
+// ESM __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Create local schema because index is acting as entry
-const scenarioSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
-  state: {
-    hardwarePerformance: Number,
-    networkReliability: Number,
-    softwareIntegration: Number,
-    itSupportMTTR: Number,
-    shadowItRisk: Number,
-    digitalDexterity: Number,
-    collaborationEffectiveness: Number,
-    automationCoverage: Number,
-  },
-  tools: [String],
-  metrics: {
-    exScore: Number,
-    roi: Number,
-    scores: {
-      productivity: Number,
-      collaboration: Number,
-      experience: Number,
-      security: Number,
-      adoption: Number,
-      efficiency: Number
-    }
-  }
-});
-
-const Scenario = mongoose.model('Scenario', scenarioSchema);
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(morgan('dev'));
+
+// Static files for production
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Initialize Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyFakeKeyForLocalTesting");
@@ -69,6 +51,40 @@ app.post('/api/scenarios', async (req, res) => {
     const newScenario = new Scenario(req.body);
     const saved = await newScenario.save();
     res.status(201).json(saved);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- Settings Routes ---
+app.get('/api/settings', async (req, res) => {
+  try {
+    let settings = await Settings.findOne({ key: 'workforce_config' });
+    if (!settings) {
+      // Create default settings if not exists
+      settings = new Settings({
+        personas: {
+          engineering: { headcount: 480 },
+          sales: { headcount: 620 },
+          operations: { headcount: 1300 }
+        }
+      });
+      await settings.save();
+    }
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/settings', async (req, res) => {
+  try {
+    const updated = await Settings.findOneAndUpdate(
+      { key: 'workforce_config' },
+      { ...req.body, updatedAt: Date.now() },
+      { new: true, upsert: true }
+    );
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -162,8 +178,10 @@ app.post('/api/analyze', async (req, res) => {
   }
 });
 
-// For local testing serve static files from frontend if built later
-app.get('/', (req, res) => res.send('TwinForge API is Up'));
+// SPA Fallback: Serve index.html for any unknown non-API routes
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../dist/index.html'));
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

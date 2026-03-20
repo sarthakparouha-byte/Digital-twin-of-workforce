@@ -28,4 +28,6 @@ const scenarioSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('Scenario', scenarioSchema);
+const Scenario = mongoose.model('Scenario', scenarioSchema);
+
+export default Scenario;

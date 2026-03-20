@@ -72,14 +72,22 @@ export function computeMetrics(state) {
   return { ...raw, exScore, roi, scores: Object.fromEntries(Object.entries(raw).map(([k,v]) => [k, Math.round(v * 100)])) }
 }
 
-export function computePersonaMetrics(state) {
+export function computePersonaMetrics(state, customPersonas = null) {
+  const activePersonas = customPersonas || personas;
   return Object.fromEntries(
-    Object.entries(personas).map(([key, persona]) => {
+    Object.entries(activePersonas).map(([key, persona]) => {
+      // Use weights from the default personas if not provided in custom
+      const weights = persona.weights || personas[key].weights;
       const weighted = {}
       Object.keys(state).forEach(dim => {
-        weighted[dim] = Math.min(100, Math.round(state[dim] * (persona.weights[dim] || 1)))
+        weighted[dim] = Math.min(100, Math.round(state[dim] * (weights[dim] || 1)))
       })
-      return [key, { ...computeMetrics(weighted), persona: persona.label, color: persona.color }]
+      return [key, { 
+        ...computeMetrics(weighted), 
+        persona: persona.label || personas[key].label, 
+        color: persona.color || personas[key].color,
+        headcount: persona.headcount
+      }]
     })
   )
 }
