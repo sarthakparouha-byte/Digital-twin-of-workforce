@@ -21,7 +21,15 @@ const History = ({ scenarios, onRestore }) => {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-      style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '2rem' }}
+      style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100vh', 
+        padding: '2rem',
+        marginLeft: '220px',
+        maxWidth: 'calc(100vw - 220px)',
+        overflowY: 'auto'
+      }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>

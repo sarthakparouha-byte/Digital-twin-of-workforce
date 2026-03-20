@@ -108,7 +108,15 @@ const AICopilot = ({ currentState, onOptimize, onViewChange }) => {
   return (
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-      style={{ display: 'flex', gap: '2rem', height: '100%', padding: '2rem' }}
+      style={{ 
+        display: 'flex', 
+        gap: '2rem', 
+        height: '100vh', 
+        padding: '2rem',
+        marginLeft: '220px',
+        maxWidth: 'calc(100vw - 220px)',
+        overflowY: 'auto'
+      }}
     >
       <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
         {/* Header */}
