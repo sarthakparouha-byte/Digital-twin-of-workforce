@@ -11,13 +11,6 @@ Problem Statement: *Digital Twin of the Workforce*
 
 ---
 
-## 🚀 Live Demo
-
-🔗 [TwinForge AI – Live App](https://twinforge.vercel.app) *(replace with your deployed URL)*
-📹 [Demo Video](https://youtube.com/your-link) *(replace with your video link)*
-
----
-
 ## 📌 The Problem
 
 Enterprises invest heavily in digital workplace tools based on assumptions, vendor benchmarks, or gut instinct — with no reliable way to predict their real impact on employees before rollout. This leads to:
