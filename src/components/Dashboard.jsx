@@ -17,9 +17,9 @@ const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onS
       transition={{ duration: 0.3 }}
       style={{
         /* ✅ FIXED: sidebar is 220px fixed. Push content right with marginLeft,
-           set a proper width so it doesn't overflow or collapse */
+           let flex handle remaining width without using 100vw which includes scrollbar */
         marginLeft: '220px',
-        width: 'calc(100vw - 220px)',
+        flex: 1,
         minHeight: '100vh',
         padding: '36px 40px',
         overflowY: 'auto',

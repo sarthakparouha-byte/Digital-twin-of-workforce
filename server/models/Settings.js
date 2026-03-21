@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const settingsSchema = new mongoose.Schema({
   key: { type: String, default: 'workforce_config', unique: true },
   orgName: { type: String, default: 'TwinForge AI' },
+  industry: { type: String, default: 'Technology' },
   totalEmployees: { type: Number, default: 2400 },
   avgSalary: { type: Number, default: 85000 },
   personas: {

@@ -36,13 +36,11 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
   ];
 
   const getStatus = (val, invert) => {
-    // 0-39 Critical, 40-59 At Risk, 60-79 Stable, 80-100 Optimized
-    // If inverted (like MTTR or Shadow IT), lower is better! Wait, the prompt says for shadow IT higher is worse
+    // If inverted (like MTTR or Shadow IT), lower is better!
     let effective = invert ? 100 - val : val;
-    if (effective < 40) return { text: "Critical", color: "var(--danger)", bg: "rgba(239, 68, 68, 0.15)" };
+    if (effective < 45) return { text: "Critical", color: "var(--danger)", bg: "rgba(239, 68, 68, 0.15)" };
     if (effective < 60) return { text: "At Risk", color: "var(--warn)", bg: "rgba(245, 158, 11, 0.15)" };
-    if (effective < 80) return { text: "Stable", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.15)" };
-    return { text: "Optimized", color: "var(--accent3)", bg: "rgba(16, 185, 129, 0.15)" };
+    return { text: "Stable", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.15)" };
   };
 
   return (

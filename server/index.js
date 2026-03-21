@@ -56,6 +56,17 @@ app.post('/api/scenarios', async (req, res) => {
   }
 });
 
+// Delete a scenario
+app.delete('/api/scenarios/:id', async (req, res) => {
+  try {
+    const deleted = await Scenario.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Scenario not found' });
+    res.json({ message: 'Scenario deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // --- Settings Routes ---
 app.get('/api/settings', async (req, res) => {
   try {
@@ -81,7 +92,7 @@ app.post('/api/settings', async (req, res) => {
   try {
     const updated = await Settings.findOneAndUpdate(
       { key: 'workforce_config' },
-      { ...req.body, updatedAt: Date.now() },
+      { key: 'workforce_config', ...req.body, updatedAt: Date.now() },
       { new: true, upsert: true }
     );
     res.json(updated);

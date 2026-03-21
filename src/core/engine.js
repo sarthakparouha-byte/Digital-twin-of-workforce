@@ -68,7 +68,7 @@ export function computeMetrics(state) {
   }
   const exScore = Math.round((raw.productivity + raw.experience + raw.adoption) / 3 * 100)
   const baselineROI = 38
-  const roi = Math.round(baselineROI + (exScore - 52) * 1.8)
+  const roi = Math.round(baselineROI + (exScore - 52) * 1.8 + Math.sin((exScore - 52) * 0.05) * 2)
   return { ...raw, exScore, roi, scores: Object.fromEntries(Object.entries(raw).map(([k,v]) => [k, Math.round(v * 100)])) }
 }
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, Bot, ShoppingBag, Clock, Settings } from 'lucide-react';
+import { LayoutDashboard, Bot, ShoppingBag, Clock, Settings, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Sidebar = ({ activeView, onViewChange, exScore, roi, totalEmployees, onOpenSettings }) => {
+const Sidebar = ({ activeView, onViewChange, exScore, roi, totalEmployees, onOpenSettings, user, onSignOut }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'copilot', label: 'AI Copilot', icon: Bot },
@@ -121,24 +121,25 @@ const Sidebar = ({ activeView, onViewChange, exScore, roi, totalEmployees, onOpe
         </div>
       </div>
 
-      <button 
-        onClick={onOpenSettings}
-        className="btn btn-outline"
-        style={{
-          width: '100%',
-          fontSize: '12px',
-          height: '40px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
-          borderColor: 'var(--border)',
-          marginTop: '16px'
-        }}
-      >
-        <Settings size={14} />
-        Setup Organization
-      </button>
+      <div style={{ marginTop: '16px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent) 0%, #7b5fff 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
+            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+          </div>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || 'Demo User'}</div>
+            <div style={{ fontSize: '11px', color: 'var(--ink-3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.company || 'TwinForge'}</div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={onOpenSettings} className="btn btn-outline" style={{ flex: 1, padding: '8px', fontSize: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
+            <Settings size={14} /> Settings
+          </button>
+          <button onClick={onSignOut} className="btn btn-outline" style={{ flex: 1, padding: '8px', fontSize: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+            <LogOut size={14} /> Logout
+          </button>
+        </div>
+      </div>
     </aside>
   );
 };

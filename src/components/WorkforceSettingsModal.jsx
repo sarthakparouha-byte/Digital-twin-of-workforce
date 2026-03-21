@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Briefcase, TrendingUp } from 'lucide-react';
 
-const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave }) => {
+const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave, isOnboarding }) => {
   const [localSettings, setLocalSettings] = useState(settings);
 
   const handleChange = (field, value) => {
@@ -42,35 +42,55 @@ const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave }) => {
           border: '1px solid rgba(255,255,255,0.1)'
         }}
       >
-        <button onClick={onClose} style={{
-          position: 'absolute', top: '20px', right: '20px',
-          background: 'transparent', border: 'none', color: 'var(--ink-3)',
-          cursor: 'pointer'
-        }}>
-          <X size={20} />
-        </button>
+        {!isOnboarding && (
+          <button onClick={onClose} style={{
+            position: 'absolute', top: '20px', right: '20px',
+            background: 'transparent', border: 'none', color: 'var(--ink-3)',
+            cursor: 'pointer'
+          }}>
+            <X size={20} />
+          </button>
+        )}
 
         <h2 style={{
           fontFamily: 'var(--font-sora)', fontSize: '22px',
           fontWeight: 700, color: 'var(--ink-1)', marginBottom: '8px'
-        }}>Organization Setup</h2>
+        }}>{isOnboarding ? 'Welcome to TwinForge AI' : 'Organization Setup'}</h2>
         <p style={{ color: 'var(--ink-3)', fontSize: '14px', marginBottom: '28px' }}>
-          Configure your workforce parameters to calibrate the simulation.
+          {isOnboarding 
+            ? 'Please set up your organization to begin the simulation.' 
+            : 'Configure your workforce parameters to calibrate the simulation.'}
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Org Name */}
-          <div className="input-field">
-            <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: '8px' }}>Organization Name</label>
-            <input 
-              type="text" 
-              value={localSettings.orgName} 
-              onChange={(e) => handleChange('orgName', e.target.value)}
-              style={{
-                width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)',
-                border: '1px solid var(--border)', borderRadius: '8px', color: 'white'
-              }}
-            />
+          {/* Org Name & Industry Row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="input-field">
+              <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: '8px' }}>Organization Name</label>
+              <input 
+                type="text" 
+                value={localSettings.orgName || ''} 
+                onChange={(e) => handleChange('orgName', e.target.value)}
+                style={{
+                  width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border)', borderRadius: '8px', color: 'white'
+                }}
+              />
+            </div>
+            
+            <div className="input-field">
+              <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: '8px' }}>Industry</label>
+              <input 
+                type="text" 
+                value={localSettings.industry || ''} 
+                onChange={(e) => handleChange('industry', e.target.value)}
+                style={{
+                  width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border)', borderRadius: '8px', color: 'white'
+                }}
+                placeholder="e.g. Technology"
+              />
+            </div>
           </div>
 
           {/* Department Headcounts */}
@@ -125,7 +145,7 @@ const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave }) => {
             onClick={() => onSave(localSettings)}
             style={{ width: '100%', marginTop: '12px', height: '48px' }}
           >
-            Apply Workforce Data
+            {isOnboarding ? 'Start Simulation' : 'Apply Workforce Data'}
           </button>
         </div>
       </motion.div>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Download, ArrowRightLeft, CheckSquare, Square } from 'lucide-react';
+import { Clock, Download, ArrowRightLeft, CheckSquare, Square, Trash2 } from 'lucide-react';
 
-const History = ({ scenarios, onRestore }) => {
+const History = ({ scenarios, onRestore, onDelete }) => {
   const [selected, setSelected] = useState([]);
   const [showCompare, setShowCompare] = useState(false);
 
@@ -27,7 +27,7 @@ const History = ({ scenarios, onRestore }) => {
         height: '100vh', 
         padding: '2rem',
         marginLeft: '220px',
-        maxWidth: 'calc(100vw - 220px)',
+        flex: 1,
         overflowY: 'auto'
       }}
     >
@@ -86,9 +86,14 @@ const History = ({ scenarios, onRestore }) => {
                              <div className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{new Date(s.timestamp).toLocaleString()}</div>
                            </div>
                         </div>
-                        <button className="btn btn-secondary" onClick={() => onRestore(s.state, s.tools)}>
-                          <Download size={16} /> Restore state
-                        </button>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <button className="btn btn-secondary" onClick={() => onRestore(s.state, s.tools)}>
+                            <Download size={16} /> Restore state
+                          </button>
+                          <button className="btn btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)' }} onClick={() => onDelete(s.id)}>
+                            <Trash2 size={16} /> Delete
+                          </button>
+                        </div>
                      </div>
 
                      <div style={{ display: 'flex', gap: '2rem', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px' }}>
