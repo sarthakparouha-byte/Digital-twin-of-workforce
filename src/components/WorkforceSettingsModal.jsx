@@ -73,7 +73,7 @@ const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave, isOnboardin
                 onChange={(e) => handleChange('orgName', e.target.value)}
                 style={{
                   width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--border)', borderRadius: '8px', color: 'white'
+                  border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--ink-1)'
                 }}
               />
             </div>
@@ -86,7 +86,7 @@ const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave, isOnboardin
                 onChange={(e) => handleChange('industry', e.target.value)}
                 style={{
                   width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--border)', borderRadius: '8px', color: 'white'
+                  border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--ink-1)'
                 }}
                 placeholder="e.g. Technology"
               />
@@ -103,7 +103,7 @@ const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave, isOnboardin
                   type="number" 
                   value={localSettings.personas.engineering.headcount} 
                   onChange={(e) => handlePersonaChange('engineering', e.target.value)}
-                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'white', fontWeight: 600, fontSize: '16px' }}
+                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--ink-1)', fontWeight: 600, fontSize: '16px' }}
                 />
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid var(--border)' }}>
@@ -112,7 +112,7 @@ const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave, isOnboardin
                   type="number" 
                   value={localSettings.personas.sales.headcount} 
                   onChange={(e) => handlePersonaChange('sales', e.target.value)}
-                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'white', fontWeight: 600, fontSize: '16px' }}
+                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--ink-1)', fontWeight: 600, fontSize: '16px' }}
                 />
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid var(--border)' }}>
@@ -121,7 +121,7 @@ const WorkforceSettingsModal = ({ isOpen, onClose, settings, onSave, isOnboardin
                   type="number" 
                   value={localSettings.personas.operations.headcount} 
                   onChange={(e) => handlePersonaChange('operations', e.target.value)}
-                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'white', fontWeight: 600, fontSize: '16px' }}
+                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--ink-1)', fontWeight: 600, fontSize: '16px' }}
                 />
               </div>
             </div>
