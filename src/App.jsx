@@ -268,6 +268,7 @@ function App() {
         exScore={currentMetrics.exScore} 
         roi={currentMetrics.roi} 
         totalEmployees={workforceSettings.totalEmployees}
+        orgName={workforceSettings.orgName}
         onOpenSettings={() => setIsSettingsOpen(true)}
         user={currentUser}
         onSignOut={handleSignOut}

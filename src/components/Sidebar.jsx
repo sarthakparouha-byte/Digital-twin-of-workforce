@@ -2,7 +2,7 @@ import React from 'react';
 import { LayoutDashboard, Bot, ShoppingBag, Clock, Settings, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Sidebar = ({ activeView, onViewChange, exScore, roi, totalEmployees, onOpenSettings, user, onSignOut }) => {
+const Sidebar = ({ activeView, onViewChange, exScore, roi, totalEmployees, orgName, onOpenSettings, user, onSignOut }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'copilot', label: 'AI Copilot', icon: Bot },
@@ -128,7 +128,7 @@ const Sidebar = ({ activeView, onViewChange, exScore, roi, totalEmployees, onOpe
           </div>
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <div style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || 'Demo User'}</div>
-            <div style={{ fontSize: '11px', color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.company || 'Enterprise Admin'}</div>
+            <div style={{ fontSize: '11px', color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{orgName || user?.company || 'Enterprise Admin'}</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
