@@ -1,205 +1,154 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Bot, CheckCircle2, ChevronRight, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
 import { optimalState, marketplaceTools } from '../core/engine';
 
 const AICopilot = ({ currentState, onOptimize, onViewChange }) => {
-  const [phase, setPhase] = useState('IDLE'); // IDLE, SCANNING, CONNECTING, ANALYZING, RECOMMENDING, OPTIMIZING, COMPLETE
-  const [lines, setLines] = useState([]);
+  const [phase, setPhase] = useState('ANALYZING'); // ANALYZING, COMPLETE, ERROR
+  const [analysisText, setAnalysisText] = useState('');
   const [recommendations, setRecommendations] = useState([]);
-  const bottomRef = useRef(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  // Prevent React 18 Strict Mode from double-executing the API request
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [lines]);
-
-  const addLine = (text, delay = 0) => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        setLines(prev => [...prev, text]);
-        resolve();
-      }, delay);
-    });
-  };
-
-  const startAnalysis = async () => {
-    setPhase('SCANNING');
-    setLines([]);
-    setRecommendations([]);
-
-    await addLine("> Initializing TwinForge Analysis Engine v3.0...", 300);
-    await addLine("> Packaging current telemetry state parameters...", 400);
-
-    setPhase('CONNECTING');
-    await addLine("> Opening connection to Google Gemini AI API...", 600);
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     
-    setPhase('ANALYZING');
-    await addLine("> Transmitting data payload... awaiting generative analysis...", 200);
-
-    try {
-      // Hitching to the new Express Backend
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentState)
-      });
-      
-      if (!response.ok) throw new Error("API returned an error");
-      const data = await response.json();
-
-      setPhase('RECOMMENDING');
-      await addLine("> LIVE ANALYSIS RECEIVED FROM GEMINI:", 400);
-      
-      // Stream the LLM text output
-      const aiText = data.analysisText || "Analysis complete.";
-      const chars = aiText.split('');
-      let currentString = "> ";
-      
-      // Simulate real-time streaming of the response
-      for (let i = 0; i < chars.length; i++) {
-        currentString += chars[i];
-        setLines(prev => {
-          const newLines = [...prev];
-          newLines[newLines.length - 1] = currentString;
-          return newLines;
+    const fetchAnalysis = async () => {
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentState)
         });
-        await new Promise(r => setTimeout(r, 20)); // Fast typing effect
+        
+        if (!response.ok) throw new Error("Backend AI connection failed.");
+        const data = await response.json();
+
+        setAnalysisText(data.analysisText || "Analysis complete. Optimization recommended.");
+        
+        const recTools = (data.recommendedToolIds || [])
+          .map(id => marketplaceTools.find(t => t.id === id))
+          .filter(Boolean);
+        
+        setRecommendations(recTools);
+        setPhase('COMPLETE');
+      } catch (error) {
+         setErrorMsg(error.message);
+         setPhase('ERROR');
       }
-
-      await addLine("> IDENTIFYING INTERVENTION PATHS...", 600);
-
-      // Map the recommended tool IDs back to our objects
-      const recTools = data.recommendedToolIds
-        .map(id => marketplaceTools.find(t => t.id === id))
-        .filter(Boolean);
-      
-      for (const tool of recTools) {
-        await addLine(`> PREPARING DEPLOYMENT: ${tool.name}`, 300);
-        setRecommendations(prev => [...prev, tool]);
-      }
-
-    } catch (error) {
-       await addLine(`> ERROR: Failed to reach Gemini API. Ensure backend is running and API key is set.`, 0);
-       await addLine(`> ${error.message}`, 0);
-       setPhase('IDLE');
-       return;
-    }
-
-    setPhase('OPTIMIZING');
-    await new Promise(r => setTimeout(r, 1000));
-    await addLine("> Calculating optimal intervention stack...", 600);
+    };
     
-    const dimensions = Object.keys(optimalState);
-    for (let dim of dimensions) {
-      if (currentState[dim] !== optimalState[dim]) {
-        await addLine(`> OPTIMIZING: ${dim} [${currentState[dim]} → ${optimalState[dim]}] ████████████`, 150);
-      }
-    }
-
-    setPhase('COMPLETE');
-    await addLine("> ✓ OPTIMIZATION COMPLETE", 500);
-    // Pass back the recommended tools to automatically activate them in the simulation
-    const toolIds = recommendations.map(r => r.id);
-    onOptimize(toolIds); 
-  };
+    fetchAnalysis();
+  }, [currentState]);
 
   return (
     <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       style={{ 
         display: 'flex', 
+        flexDirection: 'column',
         gap: '2rem', 
         height: '100vh', 
-        padding: '2rem',
-        marginLeft: '220px',
-        maxWidth: 'calc(100vw - 220px)',
-        overflowY: 'auto'
+        padding: '3.5rem 4rem',
+        marginLeft: '260px', /* Account for sidebar */
+        maxWidth: '1200px',
+        fontFamily: 'var(--font-body)',
+        color: 'var(--ink-1)'
       }}
     >
-      <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-           <div>
-             <h2 className="font-mono text-cyan" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: 0 }}>
-               <Bot size={28} className={phase !== 'IDLE' && phase !== 'COMPLETE' ? 'animate-pulse' : ''} />
-               TwinForge Live AI Copilot
-             </h2>
-           </div>
-           <div>
-             {phase === 'IDLE' && <span className="font-mono text-muted">READY</span>}
-             {phase !== 'IDLE' && phase !== 'COMPLETE' && <span className="font-mono text-amber animate-pulse">ANALYZING...</span>}
-             {phase === 'COMPLETE' && <span className="font-mono text-green">COMPLETE</span>}
-           </div>
+      {/* Premium Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '1.5rem' }}>
+        <div style={{ background: 'var(--accent)', padding: '0.85rem', borderRadius: '12px', display: 'flex' }}>
+           <Sparkles size={24} color="#fff" />
         </div>
-
-        {/* Terminal */}
-        <div style={{
-           flex: 1, background: '#040b16', borderRadius: '8px', padding: '1.5rem', 
-           fontFamily: 'var(--font-mono)', color: 'var(--accent3)', overflowY: 'auto',
-           fontSize: '0.9rem', lineHeight: '1.6', border: '1px solid rgba(16, 185, 129, 0.2)',
-           boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
-        }}>
-          {lines.map((line, i) => (
-            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{line}</motion.div>
-          ))}
-          {phase !== 'IDLE' && phase !== 'COMPLETE' && (
-            <div className="cursor-blink" style={{ color: 'var(--accent3)' }}>_</div>
-          )}
-          {phase === 'IDLE' && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <button 
-                className="btn btn-primary" 
-                style={{ padding: '1rem 2rem', fontSize: '1.1rem', background: 'linear-gradient(135deg, var(--accent2), var(--accent))' }}
-                onClick={startAnalysis}
-              >
-                <Bot size={24} />
-                Connect to Gemini API
-              </button>
-            </div>
-          )}
-          {phase === 'COMPLETE' && (
-             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={() => onViewChange('dashboard')}
-                  style={{ background: 'var(--accent3)', color: '#000' }}
-                >
-                  View Results on Dashboard
-                  <ChevronRight size={18} />
-                </button>
-             </motion.div>
-          )}
-          <div ref={bottomRef} />
+        <div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#ffffff', margin: 0, letterSpacing: '-0.3px', fontFamily: 'var(--font-sora)' }}>
+            TwinForge Executive AI Analysis
+          </h2>
+          <p style={{ color: 'var(--ink-3)', margin: '6px 0 0 0', fontSize: '0.9rem' }}>
+            Powered by Generative AI • Scanning enterprise telemetry
+          </p>
         </div>
       </div>
 
-      {/* Recommended Tools Panel */}
-      <AnimatePresence>
-         {recommendations.length > 0 && (
-            <motion.div 
-               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-               className="glass-card" style={{ width: '350px', display: 'flex', flexDirection: 'column' }}
-            >
-               <h3 className="font-mono text-cyan" style={{ fontSize: '1.1rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <CheckCircle2 size={18} /> AI Prescribed Interventions
-               </h3>
-               <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '0.5rem' }}>
-                  {recommendations.map(tool => (
-                    <motion.div 
-                      key={tool.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', padding: '1rem', borderRadius: '8px' }}
-                    >
-                       <div style={{ fontWeight: 'bold', color: 'var(--text)', marginBottom: '4px' }}>{tool.name}</div>
-                       <div style={{ fontSize: '0.8rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>{tool.vendor}</div>
-                       <div className="font-mono text-cyan" style={{ fontSize: '0.8rem' }}>{tool.priceLabel}</div>
-                    </motion.div>
-                  ))}
-               </div>
-            </motion.div>
-         )}
-      </AnimatePresence>
+      {phase === 'ANALYZING' && (
+         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, color: 'var(--ink-2)', gap: '1.5rem', marginTop: '4rem' }}>
+            <Loader2 className="animate-spin" size={44} color="var(--accent)" />
+            <div style={{ fontSize: '1.1rem', fontWeight: 500, letterSpacing: '-0.2px' }}>Correlating telemetry data & pinpointing friction...</div>
+         </div>
+      )}
+
+      {phase === 'ERROR' && (
+         <div className="card" style={{ padding: '2rem', border: '1px solid var(--warn)', background: 'rgba(239, 68, 68, 0.05)', color: 'var(--warn)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '2rem', borderRadius: '16px' }}>
+            <AlertTriangle size={32} />
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>Analysis Failed</div>
+            <div style={{ color: 'var(--warn)', opacity: 0.8 }}>{errorMsg || "Unable to reach the Gemini API. Please check your network connection and backend configuration."}</div>
+         </div>
+      )}
+
+      {phase === 'COMPLETE' && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} style={{ display: 'flex', gap: '2.5rem', marginTop: '1rem' }}>
+          
+          <div style={{ flex: 1.8, display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+            
+            {/* The Analysis Context */}
+            <div className="card" style={{ padding: '2.5rem', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--ink-1)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontFamily: 'var(--font-sora)' }}>
+                 <Bot size={22} color="var(--accent)" /> Strategic Insights
+              </h3>
+              <div style={{ fontSize: '1.05rem', lineHeight: '1.8', color: 'var(--ink-2)', letterSpacing: '0.1px' }}>
+                {analysisText}
+              </div>
+            </div>
+
+            {/* Action Logic */}
+            <div style={{ display: 'flex', gap: '1rem' }}>
+                <button 
+                  className="btn-apply" 
+                  onClick={() => onOptimize(recommendations.map(r => r.id))}
+                  style={{ background: 'var(--accent)', color: '#fff', padding: '1rem 1.5rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 600, borderRadius: '12px', border: 'none', cursor: 'pointer', flex: 1, justifyContent: 'center' }}
+                >
+                  <CheckCircle2 size={18} />
+                  Authorize Interventions
+                </button>
+                <button 
+                  className="btn-ghost" 
+                  onClick={() => onViewChange('dashboard')}
+                  style={{ padding: '1rem 1.5rem', fontSize: '1rem', fontWeight: 600, borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', flex: 1, justifyContent: 'center', background: 'var(--surface-2)', color: 'var(--ink-1)', border: '1px solid var(--border-2)' }}
+                >
+                  Return to Dashboard
+                </button>
+            </div>
+          </div>
+
+          {/* Sidebar Tools Grid */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.5rem' }}>
+               Recommended Tooling
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {recommendations.length > 0 ? recommendations.map((tool, idx) => (
+                 <motion.div 
+                   key={tool.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.1 }}
+                   className="card" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '1.5rem', borderRadius: '12px' }}
+                 >
+                    <div style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--ink-1)', marginBottom: '6px', fontFamily: 'var(--font-sora)' }}>{tool.name}</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--ink-3)', marginBottom: '1.25rem' }}>{tool.vendor}</div>
+                    <div style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', background: 'rgba(79, 124, 255, 0.1)', padding: '4px 10px', borderRadius: '4px', letterSpacing: '0.5px' }}>
+                      {tool.priceLabel}
+                    </div>
+                 </motion.div>
+              )) : (
+                 <div style={{ color: 'var(--ink-3)', fontSize: '0.9rem', padding: '1rem' }}>No specific tools identified.</div>
+              )}
+            </div>
+          </div>
+
+        </motion.div>
+      )}
     </motion.div>
   );
 };

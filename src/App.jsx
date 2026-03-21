@@ -9,6 +9,9 @@ import WorkforceSettingsModal from './components/WorkforceSettingsModal';
 import LandingPage from './components/auth/LandingPage';
 import LoginPage from './components/auth/LoginPage';
 import OnboardingWizard from './components/auth/OnboardingWizard';
+import IntegrationsPanel from './components/IntegrationsPanel';
+import ROITrendChart from './components/ROITrendChart';
+import NetworkGraph from './components/NetworkGraph';
 import { baselineState, computeMetrics, computePersonaMetrics, marketplaceTools, optimalState } from './core/engine';
 import './App.css';
 
@@ -82,24 +85,9 @@ function App() {
     initApp();
   }, []);
 
-  // Compute effective state by layering tools on top of base simState
-  const effectiveState = useMemo(() => {
-    let state = { ...simState };
-    const tools = purchasedTools.map(id => marketplaceTools.find(t => t.id === id)).filter(Boolean);
-    
-    tools.forEach(t => {
-      Object.entries(t.effects).forEach(([key, val]) => {
-        if (state[key] !== undefined) {
-          state[key] = Math.min(100, Math.max(0, state[key] + val));
-        }
-      });
-    });
-    return state;
-  }, [simState, purchasedTools]);
-
   const baselineMetrics = useMemo(() => computeMetrics(baselineState), []);
-  const currentMetrics = useMemo(() => computeMetrics(effectiveState), [effectiveState]);
-  const personaMetrics = useMemo(() => computePersonaMetrics(effectiveState, workforceSettings.personas), [effectiveState, workforceSettings]);
+  const currentMetrics = useMemo(() => computeMetrics(simState), [simState]);
+  const personaMetrics = useMemo(() => computePersonaMetrics(simState, workforceSettings.personas), [simState, workforceSettings]);
 
   // Handlers
   const handleStateChange = (key, value) => {
@@ -141,8 +129,21 @@ function App() {
 
   const handleOptimize = (recToolIds = []) => {
     if (recToolIds.length > 0) {
-      // If AI recommended tools, just apply the tools
-      setPurchasedTools(recToolIds);
+      // Apply recommended tools math into raw simState
+      setSimState(prev => {
+        let newState = { ...prev };
+        const toolsToApply = recToolIds.filter(id => !purchasedTools.includes(id)).map(id => marketplaceTools.find(t => t.id === id));
+        toolsToApply.forEach(tool => {
+           if (tool) {
+             Object.entries(tool.effects).forEach(([key, val]) => {
+               if (newState[key] !== undefined) newState[key] = Math.min(100, Math.max(0, newState[key] + val));
+             });
+           }
+        });
+        return newState;
+      });
+      // Deduplicate additions
+      setPurchasedTools(prev => Array.from(new Set([...prev, ...recToolIds])));
     } else {
       setSimState(optimalState);
       setPurchasedTools([]); 
@@ -151,13 +152,27 @@ function App() {
   };
 
   const handleToggleTool = (id) => {
-    setPurchasedTools(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+    const isPurchased = purchasedTools.includes(id);
+    const tool = marketplaceTools.find(t => t.id === id);
+    if (tool) {
+      setSimState(prev => {
+        let newState = { ...prev };
+        Object.entries(tool.effects).forEach(([key, val]) => {
+          const delta = isPurchased ? -val : val;
+          if (newState[key] !== undefined) {
+             newState[key] = Math.min(100, Math.max(0, newState[key] + delta));
+          }
+        });
+        return newState;
+      });
+    }
+    setPurchasedTools(prev => isPurchased ? prev.filter(t => t !== id) : [...prev, id]);
   };
 
   const handleSaveScenario = async () => {
     const scenarioPayload = {
       name: `Scenario ${scenarios.length + 1} - ${purchasedTools.length > 0 ? 'AI Tool Investment' : 'Base Config'}`,
-      state: effectiveState,
+      state: simState,
       tools: purchasedTools,
       metrics: currentMetrics
     };
@@ -261,15 +276,24 @@ function App() {
         <AnimatePresence mode="wait">
           {activeView === 'dashboard' && (
             <Dashboard 
-              key="dashboard" state={simState} baselineMetrics={baselineMetrics} currentMetrics={currentMetrics}
-              personaMetrics={personaMetrics} onStateChange={handleStateChange} onReset={handleReset}
-              onOptimize={handleOptimize} onRunAI={() => setActiveView('copilot')} onSaveScenario={handleSaveScenario}
+              key="dashboard"
+              state={simState} 
+              baselineMetrics={baselineMetrics} 
+              currentMetrics={currentMetrics}
+              personaMetrics={personaMetrics} 
+              workforceSettings={workforceSettings}
+              userRole={currentUser?.role}
+              onStateChange={handleStateChange} 
+              onReset={handleReset}
+              onOptimize={handleOptimize} 
+              onRunAI={() => setActiveView('copilot')} 
+              onSaveScenario={handleSaveScenario}
             />
           )}
 
           {activeView === 'copilot' && (
              <AICopilot 
-               key="copilot" currentState={effectiveState} onOptimize={handleOptimize} onViewChange={setActiveView}
+               key="copilot" currentState={simState} onOptimize={handleOptimize} onViewChange={setActiveView}
              />
           )}
 

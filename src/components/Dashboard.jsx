@@ -3,10 +3,11 @@ import KPICard from './KPICard';
 import SliderPanel from './SliderPanel';
 import PersonaRadarChart from './RadarChart';
 import PersonaBarChart from './PersonaBarChart';
+import ROITrendChart from './ROITrendChart';
 import { Bot, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onStateChange, onReset, onOptimize, onRunAI, onSaveScenario }) => {
+const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, workforceSettings, userRole, onStateChange, onReset, onOptimize, onRunAI, onSaveScenario }) => {
 
   return (
     <motion.div
@@ -33,7 +34,7 @@ const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onS
             fontFamily: 'var(--font-sora)',
             fontSize: '26px',
             fontWeight: 700,
-            color: 'var(--ink-1)',
+            color: '#ffffff',
             letterSpacing: '-0.3px'
           }}>Digital Workforce Twin</div>
           <div style={{
@@ -104,12 +105,16 @@ const Dashboard = ({ state, baselineMetrics, currentMetrics, personaMetrics, onS
       {/* Main Content */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         {/* Left Column */}
-        <SliderPanel
-          state={state}
-          onChange={onStateChange}
-          onReset={onReset}
-          onOptimize={onOptimize}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <SliderPanel
+            state={state}
+            onChange={onStateChange}
+            onReset={onReset}
+            onOptimize={onOptimize}
+            userRole={userRole}
+          />
+          <ROITrendChart currentROI={currentMetrics.roi} />
+        </div>
 
         {/* Right Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

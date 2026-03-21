@@ -72,8 +72,8 @@ const History = ({ scenarios, onRestore, onDelete }) => {
                      className="glass-card"
                      style={{ 
                        padding: '1.5rem', 
-                       border: isChecked ? '1px solid var(--accent)' : '1px solid var(--border)',
-                       background: isChecked ? 'rgba(0, 212, 255, 0.05)' : undefined
+                       border: isChecked ? '2px solid #2563eb' : '1px solid var(--border)',
+                       background: isChecked ? '#eff6ff' : '#ffffff'
                      }}
                    >
                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
@@ -96,18 +96,18 @@ const History = ({ scenarios, onRestore, onDelete }) => {
                         </div>
                      </div>
 
-                     <div style={{ display: 'flex', gap: '2rem', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px' }}>
+                     <div style={{ display: 'flex', gap: '2rem', background: '#f8f9fa', border: '1px solid #e5e7eb', padding: '1rem', borderRadius: '8px' }}>
                         <div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase' }}>EX Score</div>
-                          <div className="font-mono text-cyan" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{s.metrics.exScore}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>EX Score</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#2563eb', fontFamily: 'var(--font-mono)' }}>{s.metrics.exScore}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase' }}>ROI</div>
-                          <div className="font-mono text-cyan" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{s.metrics.roi}%</div>
+                          <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>ROI</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#2563eb', fontFamily: 'var(--font-mono)' }}>{s.metrics.roi}%</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Active Tools</div>
-                          <div className="font-mono" style={{ fontSize: '1.25rem' }}>{s.tools.length}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Active Tools</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0a0a0a', fontFamily: 'var(--font-mono)' }}>{s.tools.length}</div>
                         </div>
                      </div>
                    </motion.div>

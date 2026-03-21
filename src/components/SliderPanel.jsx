@@ -23,7 +23,7 @@ const AnimatedMiniCounter = ({ value, isPercent }) => {
   return <span>{display}{isPercent ? '%' : ''}</span>;
 }
 
-const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
+const SliderPanel = ({ state, onChange, onReset, onOptimize, userRole }) => {
   const configs = [
     { key: "hardwarePerformance", label: "Hardware Performance" },
     { key: "networkReliability", label: "Network Reliability" },
@@ -36,11 +36,10 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
   ];
 
   const getStatus = (val, invert) => {
-    // If inverted (like MTTR or Shadow IT), lower is better!
     let effective = invert ? 100 - val : val;
-    if (effective < 45) return { text: "Critical", color: "var(--danger)", bg: "rgba(239, 68, 68, 0.15)" };
-    if (effective < 60) return { text: "At Risk", color: "var(--warn)", bg: "rgba(245, 158, 11, 0.15)" };
-    return { text: "Stable", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.15)" };
+    if (effective < 45) return { text: "CRITICAL", badgeClass: "badge-critical" };
+    if (effective < 60) return { text: "AT RISK",  badgeClass: "badge-risk" };
+    return { text: "STABLE", badgeClass: "badge-stable" };
   };
 
   return (
@@ -79,16 +78,7 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
                     }}>Optimized</span>
                   )}
                   {!isOptimized && (
-                    <span style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      letterSpacing: '1px',
-                      textTransform: 'uppercase',
-                      color: status.color,
-                      background: status.bg,
-                      padding: '3px 8px',
-                      borderRadius: '4px'
-                    }}>{status.text}</span>
+                    <span className={status.badgeClass}>{status.text}</span>
                   )}
                   <span style={{
                     fontFamily: 'var(--font-mono)',
@@ -107,7 +97,7 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
                   top: '50%',
                   left: 0, right: 0,
                   height: '4px',
-                  background: 'var(--surface-2)',
+                  background: '#e5e7eb',
                   borderRadius: '2px',
                   transform: 'translateY(-50%)',
                   pointerEvents: 'none'
@@ -117,7 +107,7 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
                   top: '50%',
                   left: 0,
                   height: '4px',
-                  background: 'linear-gradient(90deg, var(--accent) 0%, #7eb3ff 100%)',
+                  background: '#2563eb',
                   borderRadius: '2px',
                   transform: 'translateY(-50%)',
                   pointerEvents: 'none',
@@ -130,7 +120,8 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
                   max="100"
                   value={val}
                   onChange={(e) => onChange(conf.key, parseInt(e.target.value))}
-                  style={{ position: 'relative', zIndex: 2 }}
+                  style={{ position: 'relative', zIndex: 2, cursor: userRole === 'Viewer' ? 'not-allowed' : 'pointer', opacity: userRole === 'Viewer' ? 0.6 : 1 }}
+                  disabled={userRole === 'Viewer'}
                 />
               </div>
             </div>
@@ -139,7 +130,7 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '28px' }}>
-        <button className="btn-ghost" onClick={onReset} style={{ 
+        <button className="btn-ghost" onClick={userRole === 'Viewer' ? null : onReset} disabled={userRole === 'Viewer'} style={{ 
           background: 'var(--surface-2)',
           border: '1px solid var(--border-2)',
           color: 'var(--ink-2)',
@@ -148,13 +139,14 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
           fontFamily: 'var(--font-body)',
           fontSize: '13px',
           fontWeight: 600,
-          cursor: 'pointer',
+          cursor: userRole === 'Viewer' ? 'not-allowed' : 'pointer',
+          opacity: userRole === 'Viewer' ? 0.4 : 1,
           transition: 'all 0.15s'
         }}>
           Reset to Baseline
         </button>
-        <button className="btn-apply" onClick={onOptimize} style={{ 
-          background: 'linear-gradient(135deg, var(--accent) 0%, #7b5fff 100%)',
+        <button className="btn-apply" onClick={userRole === 'Viewer' ? null : onOptimize} disabled={userRole === 'Viewer'} style={{ 
+          background: '#2563eb',
           color: '#fff',
           padding: '12px',
           borderRadius: 'var(--radius-sm)',
@@ -162,9 +154,10 @@ const SliderPanel = ({ state, onChange, onReset, onOptimize }) => {
           fontSize: '13px',
           fontWeight: 600,
           border: 'none',
-          cursor: 'pointer',
+          cursor: userRole === 'Viewer' ? 'not-allowed' : 'pointer',
+          opacity: userRole === 'Viewer' ? 0.4 : 1,
           transition: 'opacity 0.15s',
-          boxShadow: '0 4px 16px rgba(79,124,255,0.35)'
+          boxShadow: userRole === 'Viewer' ? 'none' : '0 4px 16px rgba(79,124,255,0.35)'
         }}>
           Apply Optimal State
         </button>

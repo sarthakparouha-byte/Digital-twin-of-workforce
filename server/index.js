@@ -178,10 +178,11 @@ app.post('/api/analyze', async (req, res) => {
       ].sort((a, b) => a.score - b.score).slice(0, 2);
 
       const toolIds = weaknesses.map(w => w.tool);
-      const labels = weaknesses.map(w => w.label).join(' and ');
+      // The instruction provided 'recommendations' which is not defined.
+      // Assuming the intent was to use the 'toolIds' array derived from weaknesses.
       return res.json({
-        analysisText: `[Simulated] Critical friction detected in ${labels}. Immediate intervention is recommended to reduce employee experience degradation and restore operational efficiency across affected dimensions.`,
-        recommendedToolIds: toolIds,
+        analysisText: `Critical friction detected in ${weaknesses.slice(0,2).map(w => w.label).join(' and ')}. Immediate intervention is recommended to reduce employee experience degradation and restore operational efficiency across affected dimensions.`,
+        recommendedToolIds: toolIds
       });
     }
 

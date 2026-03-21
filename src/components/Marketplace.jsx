@@ -109,13 +109,13 @@ const Marketplace = ({ purchasedTools, onToggleTool, currentMetrics, baseMetrics
                       {tool.description}
                     </p>
 
-                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                       <div className="font-mono text-cyan" style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '8px' }}>
+                    <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                       <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0a0a0a', marginBottom: '8px' }}>
                          {tool.priceLabel}
                        </div>
                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                           {Object.entries(tool.effects).map(([key, val]) => (
-                            <span key={key} className="font-mono" style={{ fontSize: '0.75rem', color: val > 0 ? 'var(--accent3)' : 'var(--danger)' }}>
+                            <span key={key} style={{ fontSize: '0.75rem', color: '#0a0a0a', fontWeight: 500 }}>
                               {val > 0 ? '+' : ''}{val} {key.replace(/([A-Z])/g, ' $1').trim()}
                             </span>
                           ))}
